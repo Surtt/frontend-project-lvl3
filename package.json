@@ -18,7 +18,11 @@
   },
   "homepage": "https://github.com/Surtt/frontend-project-lvl3#readme",
   "dependencies": {
-    "bootstrap": "^4.6.0"
+    "axios": "^0.21.1",
+    "bootstrap": "^4.6.0",
+    "lodash": "^4.17.20",
+    "on-change": "^2.2.3",
+    "yup": "^0.32.8"
   },
   "devDependencies": {
     "css-loader": "^5.0.1",
