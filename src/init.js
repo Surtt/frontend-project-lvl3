@@ -2,6 +2,7 @@ import _ from 'lodash';
 import axios from 'axios';
 import onChange from 'on-change';
 import * as yup from 'yup';
+import parser from './parser.js';
 import view from './view.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -39,7 +40,7 @@ export default () => {
     posts: [],
   };
 
-  const watchedState = onChange(state, view);
+  const watchedState = onChange(state, view(state.rssFeeds, state.posts));
 
   const form = document.querySelector('form');
 
@@ -57,19 +58,43 @@ export default () => {
     }
 
     watchedState.form.processState = 'sending';
+    watchedState.rssFeeds.forEach((feed) => {
+      if (feed.url === link) {
+        console.log('ddd');
+      }
+    });
     console.log(state);
-    console.log(link);
-    axios.get(link)
-      .then(() => {
-        // console.log(res.data);
+    axios.get(`https://hexlet-allorigins.herokuapp.com/get?url=${encodeURIComponent(link)}`)
+      .then((response) => {
+        const doc = parser(response.data.contents);
+        const feedTitle = doc.querySelector('title');
+        const feedDescription = doc.querySelector('description');
+
+        const items = doc.querySelectorAll('item');
+        console.log(items);
+        items.forEach((item) => {
+          const postTitle = item.querySelector('title');
+          const postDescription = item.querySelector('description');
+          const postLink = item.querySelector('link');
+
+          watchedState.posts.push({
+            id: Number(_.uniqueId()),
+            title: postTitle.textContent,
+            description: postDescription.textContent,
+            link: postLink.textContent,
+          });
+        });
+
+        watchedState.rssFeeds.push({
+          id: Number(_.uniqueId()),
+          title: feedTitle.textContent,
+          description: feedDescription.textContent,
+          url: link,
+        });
+
+        console.log(state);
+
         watchedState.form.processState = 'finished';
-        fetch(`https://hexlet-allorigins.herokuapp.com/get?url=${encodeURIComponent(link)}`)
-          .then((response) => {
-            if (response.ok) return response.json();
-            throw new Error('Network response was not ok.');
-          })
-          .then((data) => console.log(data.contents));
-        // return res;
       })
       .catch((error) => {
         watchedState.form.processError = errorMessages.network.error;
