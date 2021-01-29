@@ -2,6 +2,8 @@ import _ from 'lodash';
 import axios from 'axios';
 import onChange from 'on-change';
 import * as yup from 'yup';
+import i18next from 'i18next';
+// import en from './locales/en.js';
 import parser from './parser.js';
 import view from './view.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -26,6 +28,22 @@ const validate = (fields) => {
 };
 
 export default () => {
+  i18next.init({
+    lng: 'en',
+    debug: true,
+    resources: {
+      en: {
+        translation: {
+          // TODO shoul add texts
+          feeds: {
+            // title: state.rssFeeds,
+            // description: state.rssFeeds,
+          },
+        },
+      },
+    },
+  });
+
   const state = {
     form: {
       processState: 'filling',
@@ -34,7 +52,7 @@ export default () => {
         rssLink: '',
       },
       valid: true,
-      errors: {},
+      errors: [],
     },
     rssFeeds: [],
     posts: [],
@@ -58,11 +76,15 @@ export default () => {
     }
 
     watchedState.form.processState = 'sending';
+
+    // TODO should make error
+    // const addedUrls = watchedState.rssFeeds.map(({ url }) => console.log(url));
     watchedState.rssFeeds.forEach((feed) => {
       if (feed.url === link) {
-        console.log('ddd');
+        console.log('Rss already exists');
       }
     });
+
     console.log(state);
     axios.get(`https://hexlet-allorigins.herokuapp.com/get?url=${encodeURIComponent(link)}`)
       .then((response) => {
@@ -70,27 +92,31 @@ export default () => {
         const feedTitle = doc.querySelector('title');
         const feedDescription = doc.querySelector('description');
 
+        const newFeed = {
+          id: Number(_.uniqueId()),
+          title: feedTitle.textContent,
+          description: feedDescription.textContent,
+          url: link,
+        };
+
         const items = doc.querySelectorAll('item');
-        console.log(items);
         items.forEach((item) => {
           const postTitle = item.querySelector('title');
           const postDescription = item.querySelector('description');
           const postLink = item.querySelector('link');
 
-          watchedState.posts.push({
+          const neewPost = {
             id: Number(_.uniqueId()),
             title: postTitle.textContent,
             description: postDescription.textContent,
             link: postLink.textContent,
-          });
+            listId: newFeed.id,
+          };
+
+          watchedState.posts.push(neewPost);
         });
 
-        watchedState.rssFeeds.push({
-          id: Number(_.uniqueId()),
-          title: feedTitle.textContent,
-          description: feedDescription.textContent,
-          url: link,
-        });
+        watchedState.rssFeeds.push(newFeed);
 
         console.log(state);
 

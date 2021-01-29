@@ -1,3 +1,5 @@
+// import i18next from 'i18next';
+
 const containerFeeds = document.querySelector('.feeds');
 const containerPosts = document.querySelector('.posts');
 const form = document.querySelector('form');
@@ -11,7 +13,6 @@ const renderSuccessText = () => {
 
 const renderFeeds = (dataFeeds) => {
   containerFeeds.innerHTML = '';
-  console.log(dataFeeds);
   const h2 = document.createElement('h2');
   h2.textContent = 'Feeds';
 
@@ -19,12 +20,11 @@ const renderFeeds = (dataFeeds) => {
   ul.classList.add('list-group', 'mb-5');
 
   dataFeeds.forEach((feed) => {
-    console.log(feed.title);
     const li = document.createElement('li');
     li.classList.add('list-group-item');
 
     const h3 = document.createElement('h3');
-    h3.textContent = feed.title;
+    h3.textContent = feed.title; // i18next.t('key')
 
     const p = document.createElement('p');
     p.textContent = feed.description;
@@ -40,7 +40,6 @@ const renderFeeds = (dataFeeds) => {
 
 const renderPosts = (dataPosts) => {
   containerPosts.innerHTML = '';
-  console.log(dataPosts);
   const h2 = document.createElement('h2');
   h2.textContent = 'Posts';
 
@@ -58,7 +57,7 @@ const renderPosts = (dataPosts) => {
     link.setAttribute('target', '_blank');
 
     li.append(link);
-    ul.prepend(li);
+    ul.append(li);
   });
   containerPosts.append(h2);
   containerPosts.append(ul);
@@ -73,7 +72,6 @@ const processStateHandle = (processState, dataFeeds, dataPosts) => {
       console.log(processState);
       break;
     case 'sending':
-      console.log(processState);
       form.reset();
       break;
     case 'finished':
@@ -90,11 +88,11 @@ const renderErrors = (element, error) => {
   if (Object.keys(error).length === 0) {
     return;
   }
+  console.log(error);
   const { message } = error.rssLink;
   element.classList.add('is-invalid');
   feedback.classList.add('text-danger');
   feedback.textContent = message;
-  console.log(message);
 };
 
 const renderValid = () => {
@@ -107,11 +105,8 @@ export default (dataFeeds, dataPosts) => (path, value) => {
   switch (path) {
     case 'form.processState':
       processStateHandle(value, dataFeeds, dataPosts);
-      console.log(value);
-      console.log(dataFeeds);
       break;
     case 'form.valid':
-      console.log(value);
       renderValid();
       break;
     case 'form.errors':
