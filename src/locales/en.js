@@ -1,6 +1,9 @@
 export default {
   translation: {
-    // feeds,
-    // feedTitle: feedTitle,
+    // errors: {
+    //   url: 'Must be valid URL',
+    //   notOneOf: 'Rss already exists',
+    // },
+    // success: 'Rss has been loaded',
   },
 };

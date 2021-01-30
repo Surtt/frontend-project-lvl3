@@ -1,4 +1,4 @@
-// import i18next from 'i18next';
+import i18next from 'i18next';
 
 const containerFeeds = document.querySelector('.feeds');
 const containerPosts = document.querySelector('.posts');
@@ -8,7 +8,7 @@ const feedback = document.querySelector('.feedback');
 
 const renderSuccessText = () => {
   feedback.classList.add('text-success');
-  feedback.textContent = 'Rss has been loaded';
+  feedback.textContent = i18next.t('success');
 };
 
 const renderFeeds = (dataFeeds) => {
@@ -63,6 +63,25 @@ const renderPosts = (dataPosts) => {
   containerPosts.append(ul);
 };
 
+const renderErrors = (error) => {
+  feedback.textContent = '';
+  if (Object.keys(error).length === 0) {
+    return;
+  }
+
+  feedback.textContent = i18next.t(`errors.${error.e.type}`);
+};
+
+const renderValid = (valid) => {
+  if (!valid) {
+    input.classList.add('is-invalid');
+    feedback.classList.add('text-danger');
+  } else {
+    input.classList.remove('is-invalid');
+    feedback.classList.remove('text-danger');
+  }
+};
+
 const processStateHandle = (processState, dataFeeds, dataPosts) => {
   switch (processState) {
     case 'failed':
@@ -84,33 +103,16 @@ const processStateHandle = (processState, dataFeeds, dataPosts) => {
   }
 };
 
-const renderErrors = (element, error) => {
-  if (Object.keys(error).length === 0) {
-    return;
-  }
-  console.log(error);
-  const { message } = error.rssLink;
-  element.classList.add('is-invalid');
-  feedback.classList.add('text-danger');
-  feedback.textContent = message;
-};
-
-const renderValid = () => {
-  input.classList.remove('is-invalid');
-  feedback.classList.remove('text-danger');
-  feedback.textContent = '';
-};
-
 export default (dataFeeds, dataPosts) => (path, value) => {
   switch (path) {
     case 'form.processState':
       processStateHandle(value, dataFeeds, dataPosts);
       break;
     case 'form.valid':
-      renderValid();
+      renderValid(value);
       break;
     case 'form.errors':
-      renderErrors(input, value);
+      renderErrors(value);
       break;
     default:
       break;
