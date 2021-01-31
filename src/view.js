@@ -14,7 +14,7 @@ const renderSuccessText = () => {
 const renderFeeds = (dataFeeds) => {
   containerFeeds.innerHTML = '';
   const h2 = document.createElement('h2');
-  h2.textContent = 'Feeds';
+  h2.textContent = i18next.t('feeds');
 
   const ul = document.createElement('ul');
   ul.classList.add('list-group', 'mb-5');
@@ -24,14 +24,14 @@ const renderFeeds = (dataFeeds) => {
     li.classList.add('list-group-item');
 
     const h3 = document.createElement('h3');
-    h3.textContent = feed.title; // i18next.t('key')
+    h3.textContent = feed.feedTitle;
 
     const p = document.createElement('p');
-    p.textContent = feed.description;
+    p.textContent = feed.feedDescription;
 
     li.append(h3);
     li.append(p);
-    ul.prepend(li);
+    ul.append(li);
   });
 
   containerFeeds.append(h2);
@@ -39,21 +39,23 @@ const renderFeeds = (dataFeeds) => {
 };
 
 const renderPosts = (dataPosts) => {
+  // console.log(posts);
   containerPosts.innerHTML = '';
   const h2 = document.createElement('h2');
-  h2.textContent = 'Posts';
+  h2.textContent = i18next.t('posts');
 
   const ul = document.createElement('ul');
   ul.classList.add('list-group');
 
   dataPosts.forEach((post) => {
+    // console.log(post);
     const li = document.createElement('li');
     li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start');
 
     const link = document.createElement('a');
     link.classList.add('font-weight-bold');
-    link.textContent = post.title;
-    link.setAttribute('href', post.link);
+    link.textContent = post.postTitle;
+    link.setAttribute('href', post.postLink);
     link.setAttribute('target', '_blank');
 
     li.append(link);

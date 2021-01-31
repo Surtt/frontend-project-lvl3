@@ -3,7 +3,7 @@ import axios from 'axios';
 import onChange from 'on-change';
 import * as yup from 'yup';
 import i18next from 'i18next';
-// import en from './locales/en.js';
+import en from './locales/en.js';
 import parser from './parser.js';
 import view from './view.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -15,7 +15,6 @@ const errorMessages = {
 };
 
 const validate = (urls, fields) => {
-  console.log(urls);
   let errors = {};
   const schema = yup.string().url().notOneOf(urls);
 
@@ -28,20 +27,41 @@ const validate = (urls, fields) => {
   return errors;
 };
 
+const addFeed = (state, feed) => {
+  console.log(feed);
+  const { feedTitle, feedDescription, posts } = feed;
+  const url = state.form.fields.rssLink;
+
+  const feedId = Number(_.uniqueId());
+
+  const newFeed = {
+    feedId,
+    feedTitle,
+    feedDescription,
+    url,
+  };
+
+  // const neewPost = {
+  //   id: Number(_.uniqueId()),
+  //   title: postTitle.textContent,
+  //   description: postDescription.textContent,
+  //   link: postLink.textContent,
+  //   listId: newFeed.id,
+  // };
+  state.rssFeeds.unshift(newFeed);
+  posts.forEach((post) => {
+    console.log(post);
+    const newPost = { ...post, feedId };
+    state.posts.unshift(newPost);
+  });
+};
+
 export default () => {
   i18next.init({
     lng: 'en',
     debug: true,
     resources: {
-      en: {
-        translation: {
-          errors: {
-            url: 'Must be valid URL',
-            notOneOf: 'Rss already exists',
-          },
-          success: 'Rss has been loaded',
-        },
-      },
+      en,
     },
   });
 
@@ -68,12 +88,12 @@ export default () => {
     const formData = new FormData(e.target);
     const link = formData.get('url');
     watchedState.form.fields.rssLink = link;
+    watchedState.form.processState = 'filling';
+
     const addedUrls = watchedState.rssFeeds.map(({ url }) => url);
-    console.log(addedUrls);
     const errors = validate(addedUrls, watchedState.form.fields.rssLink);
     watchedState.form.valid = _.isEqual(errors, {});
     watchedState.form.errors = errors;
-    console.log(errors);
 
     if (Object.keys(errors).length === 0) {
       watchedState.form.valid = true;
@@ -82,35 +102,38 @@ export default () => {
       console.log(state);
       axios.get(`https://hexlet-allorigins.herokuapp.com/get?url=${encodeURIComponent(link)}`)
         .then((response) => {
-          const doc = parser(response.data.contents);
-          const feedTitle = doc.querySelector('title');
-          const feedDescription = doc.querySelector('description');
+          // const doc = parser(response.data.contents);
+          // console.log(doc);
+          // const feedTitle = doc.querySelector('title');
+          // const feedDescription = doc.querySelector('description');
 
-          const newFeed = {
-            id: Number(_.uniqueId()),
-            title: feedTitle.textContent,
-            description: feedDescription.textContent,
-            url: link,
-          };
+          // const newFeed = {
+          //   id: Number(_.uniqueId()),
+          //   title: feedTitle.textContent,
+          //   description: feedDescription.textContent,
+          //   url: link,
+          // };
+          // console.log(response.data.contents);
+          addFeed(watchedState, parser(response.data.contents));
 
-          const items = doc.querySelectorAll('item');
-          items.forEach((item) => {
-            const postTitle = item.querySelector('title');
-            const postDescription = item.querySelector('description');
-            const postLink = item.querySelector('link');
+          // const items = doc.querySelectorAll('item');
+          // items.forEach((item) => {
+          //   const postTitle = item.querySelector('title');
+          //   const postDescription = item.querySelector('description');
+          //   const postLink = item.querySelector('link');
 
-            const neewPost = {
-              id: Number(_.uniqueId()),
-              title: postTitle.textContent,
-              description: postDescription.textContent,
-              link: postLink.textContent,
-              listId: newFeed.id,
-            };
+          //   const neewPost = {
+          //     id: Number(_.uniqueId()),
+          //     title: postTitle.textContent,
+          //     description: postDescription.textContent,
+          //     link: postLink.textContent,
+          //     listId: newFeed.id,
+          //   };
 
-            watchedState.posts.push(neewPost);
-          });
+          //   watchedState.posts.push(neewPost);
+          // });
 
-          watchedState.rssFeeds.push(newFeed);
+          // watchedState.rssFeeds.push(newFeed);
 
           console.log(state);
 
@@ -122,13 +145,5 @@ export default () => {
           return error;
         });
     }
-
-    // TODO should make error
-    // const addedUrls = watchedState.rssFeeds.map(({ url }) => console.log(url));
-    // watchedState.rssFeeds.forEach((feed) => {
-    //   if (feed.url === link) {
-    //     console.log('Rss already exists');
-    //   }
-    // });
   });
 };
