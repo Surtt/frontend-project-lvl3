@@ -28,8 +28,9 @@ const validate = (urls, fields) => {
 };
 
 const addFeed = (state, feed) => {
-  console.log(feed);
-  const { feedTitle, feedDescription, posts } = feed;
+  const {
+    feedTitle, feedDescription, posts,
+  } = feed;
   const url = state.form.fields.rssLink;
 
   const feedId = Number(_.uniqueId());
@@ -41,18 +42,39 @@ const addFeed = (state, feed) => {
     url,
   };
 
-  // const neewPost = {
-  //   id: Number(_.uniqueId()),
-  //   title: postTitle.textContent,
-  //   description: postDescription.textContent,
-  //   link: postLink.textContent,
-  //   listId: newFeed.id,
-  // };
   state.rssFeeds.unshift(newFeed);
+
   posts.forEach((post) => {
-    console.log(post);
     const newPost = { ...post, feedId };
     state.posts.unshift(newPost);
+  });
+};
+
+const getProxyUrl = (url) => `https://hexlet-allorigins.herokuapp.com/get?url=${encodeURIComponent(url)}`;
+
+const updateFeeds = (state) => {
+  state.rssFeeds.forEach((feed) => {
+    axios.get(getProxyUrl(feed.url))
+      .then((response) => {
+        const { feedId } = feed;
+        console.log(feedId);
+        const feedData = parser(response.data.contents);
+        feedData.posts
+          .filter((post) => Date.parse(post.postDate) > state.date)
+          .forEach((post) => {
+            const newPost = { ...post, feedId };
+            state.posts.unshift(newPost);
+            const updateState = state;
+            updateState.date = Date.now();
+          });
+
+        setTimeout(() => updateFeeds(state), 5000);
+      })
+      .catch((error) => {
+        const updateState = state;
+        updateState.form.processError = error.response.status;
+        setTimeout(() => updateFeeds(state), 5000);
+      });
   });
 };
 
@@ -73,10 +95,11 @@ export default () => {
         rssLink: '',
       },
       valid: true,
-      errors: [],
+      errors: {},
     },
     rssFeeds: [],
     posts: [],
+    date: Date.now(),
   };
 
   const watchedState = onChange(state, view(state.rssFeeds, state.posts));
@@ -100,44 +123,12 @@ export default () => {
       watchedState.form.processState = 'sending';
 
       console.log(state);
-      axios.get(`https://hexlet-allorigins.herokuapp.com/get?url=${encodeURIComponent(link)}`)
+      axios.get(getProxyUrl(link))
         .then((response) => {
-          // const doc = parser(response.data.contents);
-          // console.log(doc);
-          // const feedTitle = doc.querySelector('title');
-          // const feedDescription = doc.querySelector('description');
-
-          // const newFeed = {
-          //   id: Number(_.uniqueId()),
-          //   title: feedTitle.textContent,
-          //   description: feedDescription.textContent,
-          //   url: link,
-          // };
-          // console.log(response.data.contents);
           addFeed(watchedState, parser(response.data.contents));
-
-          // const items = doc.querySelectorAll('item');
-          // items.forEach((item) => {
-          //   const postTitle = item.querySelector('title');
-          //   const postDescription = item.querySelector('description');
-          //   const postLink = item.querySelector('link');
-
-          //   const neewPost = {
-          //     id: Number(_.uniqueId()),
-          //     title: postTitle.textContent,
-          //     description: postDescription.textContent,
-          //     link: postLink.textContent,
-          //     listId: newFeed.id,
-          //   };
-
-          //   watchedState.posts.push(neewPost);
-          // });
-
-          // watchedState.rssFeeds.push(newFeed);
-
-          console.log(state);
-
+          updateFeeds(watchedState);
           watchedState.form.processState = 'finished';
+          console.log(state);
         })
         .catch((error) => {
           watchedState.form.processError = errorMessages.network.error;

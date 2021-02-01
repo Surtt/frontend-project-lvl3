@@ -39,7 +39,6 @@ const renderFeeds = (dataFeeds) => {
 };
 
 const renderPosts = (dataPosts) => {
-  // console.log(posts);
   containerPosts.innerHTML = '';
   const h2 = document.createElement('h2');
   h2.textContent = i18next.t('posts');
@@ -59,7 +58,7 @@ const renderPosts = (dataPosts) => {
     link.setAttribute('target', '_blank');
 
     li.append(link);
-    ul.append(li);
+    ul.prepend(li);
   });
   containerPosts.append(h2);
   containerPosts.append(ul);

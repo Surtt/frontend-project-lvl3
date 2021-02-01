@@ -9,7 +9,10 @@ export default (response) => {
     const postTitle = item.querySelector('title').textContent;
     const postDescription = item.querySelector('description').textContent;
     const postLink = item.querySelector('link').textContent;
-    return { postTitle, postDescription, postLink };
+    const postDate = item.querySelector('pubDate').textContent;
+    return {
+      postTitle, postDescription, postLink, postDate,
+    };
   });
 
   return { feedTitle, feedDescription, posts };
