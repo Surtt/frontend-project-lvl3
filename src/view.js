@@ -85,9 +85,9 @@ const renderPosts = (dataPosts) => {
   containerPosts.append(ul);
 };
 
-const renderModal = (postId, element) => {
-  // element.modalTitle = post.title;
-};
+// const renderModal = (postId, element) => {
+//   // element.modalTitle = post.title;
+// };
 
 const renderErrors = (error) => {
   feedback.textContent = '';
