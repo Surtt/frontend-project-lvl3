@@ -7,5 +7,6 @@ export default {
     success: 'Rss has been loaded',
     feeds: 'Feeds',
     posts: 'Posts',
+    button: 'Preview',
   },
 };

@@ -31,7 +31,7 @@ const renderFeeds = (dataFeeds) => {
 
     li.append(h3);
     li.append(p);
-    ul.append(li);
+    ul.prepend(li);
   });
 
   containerFeeds.append(h2);
@@ -39,6 +39,7 @@ const renderFeeds = (dataFeeds) => {
 };
 
 const renderPosts = (dataPosts) => {
+  console.log(dataPosts);
   containerPosts.innerHTML = '';
   const h2 = document.createElement('h2');
   h2.textContent = i18next.t('posts');
@@ -47,21 +48,45 @@ const renderPosts = (dataPosts) => {
   ul.classList.add('list-group');
 
   dataPosts.forEach((post) => {
-    // console.log(post);
+    console.log(post);
     const li = document.createElement('li');
     li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start');
 
     const link = document.createElement('a');
     link.classList.add('font-weight-bold');
     link.textContent = post.postTitle;
+    link.dataset.id = post.id;
     link.setAttribute('href', post.postLink);
     link.setAttribute('target', '_blank');
 
+    const btn = document.createElement('button');
+    btn.classList.add('btn', 'btn-primary', 'btn-sm');
+    btn.textContent = i18next.t('button');
+    btn.setAttribute('type', 'button');
+    btn.dataset.id = post.id;
+    btn.dataset.toggle = 'modal';
+    btn.dataset.target = '#modal';
+    btn.addEventListener('click', (e) => {
+      const { body } = document;
+      console.log(body);
+      const modal = document.getElementById('modal');
+      if (e.target.dataset.id === link.dataset.id) {
+        body.classList.toggle('modal-open');
+        modal.classList.toggle('show');
+        modal.style.display = 'block';
+      }
+    });
+
     li.append(link);
-    ul.prepend(li);
+    li.append(btn);
+    ul.append(li);
   });
   containerPosts.append(h2);
   containerPosts.append(ul);
+};
+
+const renderModal = (postId, element) => {
+  // element.modalTitle = post.title;
 };
 
 const renderErrors = (error) => {
@@ -83,7 +108,7 @@ const renderValid = (valid) => {
   }
 };
 
-const processStateHandle = (processState, dataFeeds, dataPosts) => {
+const processStateHandle = (processState) => {
   switch (processState) {
     case 'failed':
       console.log(processState);
@@ -96,24 +121,28 @@ const processStateHandle = (processState, dataFeeds, dataPosts) => {
       break;
     case 'finished':
       renderSuccessText();
-      renderFeeds(dataFeeds);
-      renderPosts(dataPosts);
       break;
     default:
       break;
   }
 };
 
-export default (dataFeeds, dataPosts) => (path, value) => {
+export default (path, value) => {
   switch (path) {
     case 'form.processState':
-      processStateHandle(value, dataFeeds, dataPosts);
+      processStateHandle(value);
       break;
     case 'form.valid':
       renderValid(value);
       break;
     case 'form.errors':
       renderErrors(value);
+      break;
+    case 'rssFeeds':
+      renderFeeds(value);
+      break;
+    case 'posts':
+      renderPosts(value);
       break;
     default:
       break;

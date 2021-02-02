@@ -42,31 +42,33 @@ const addFeed = (state, feed) => {
     url,
   };
 
-  state.rssFeeds.unshift(newFeed);
+  state.rssFeeds.push(newFeed);
 
   posts.forEach((post) => {
-    const newPost = { ...post, feedId };
-    state.posts.unshift(newPost);
+    const newPost = { ...post, feedId, id: Number(_.uniqueId()) };
+    state.posts.push(newPost);
   });
 };
 
-const getProxyUrl = (url) => `https://hexlet-allorigins.herokuapp.com/get?url=${encodeURIComponent(url)}`;
+const getProxyUrl = (url) => `https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(url)}`;
 
 const updateFeeds = (state) => {
   state.rssFeeds.forEach((feed) => {
     axios.get(getProxyUrl(feed.url))
       .then((response) => {
         const { feedId } = feed;
-        console.log(feedId);
         const feedData = parser(response.data.contents);
-        feedData.posts
-          .filter((post) => Date.parse(post.postDate) > state.date)
-          .forEach((post) => {
-            const newPost = { ...post, feedId };
-            state.posts.unshift(newPost);
-            const updateState = state;
-            updateState.date = Date.now();
-          });
+        const resultFilter = feedData.posts.filter((post) => {
+          console.log(post.postDate, state.date);
+          const result = Date.parse(post.postDate) > state.date;
+          return result;
+        });
+        resultFilter.forEach((post) => {
+          const newPost = { ...post, feedId };
+          state.posts.unshift(newPost);
+          const updateState = state;
+          updateState.date = Date.now();
+        });
 
         setTimeout(() => updateFeeds(state), 5000);
       })
@@ -102,7 +104,7 @@ export default () => {
     date: Date.now(),
   };
 
-  const watchedState = onChange(state, view(state.rssFeeds, state.posts));
+  const watchedState = onChange(state, view);
 
   const form = document.querySelector('form');
 
