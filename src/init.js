@@ -6,7 +6,6 @@ import i18next from 'i18next';
 import en from './locales/en.js';
 import parser from './parser.js';
 import view from './view.js';
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 const errorMessages = {
   network: {
