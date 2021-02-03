@@ -4,16 +4,16 @@ const containerFeeds = document.querySelector('.feeds');
 const containerPosts = document.querySelector('.posts');
 const form = document.querySelector('form');
 const input = document.querySelector('[aria-label="url"]');
-const btnAdd = form.querySelector('[aria-label="add"]');
+const btnAdd = document.querySelector('[aria-label="add"]');
 const feedback = document.querySelector('.feedback');
 
 const { body } = document;
 const backdrop = document.createElement('div');
 const modal = document.getElementById('modal');
-const modalTitle = modal.querySelector('.modal-title');
-const modalBody = modal.querySelector('.modal-body');
-const fullArticle = modal.querySelector('.full-article');
-const closeBtn = modal.querySelectorAll('[data-dismiss="modal"');
+const modalTitle = document.querySelector('.modal-title');
+const modalBody = document.querySelector('.modal-body');
+const fullArticle = document.querySelector('.full-article');
+const closeBtn = document.querySelectorAll('[data-dismiss="modal"');
 
 const uiState = {
   posts: [],
