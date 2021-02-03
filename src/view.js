@@ -3,7 +3,7 @@ import i18next from 'i18next';
 const containerFeeds = document.querySelector('.feeds');
 const containerPosts = document.querySelector('.posts');
 const form = document.querySelector('form');
-const input = form.querySelector('input');
+const input = document.querySelector('[aria-label="url"]');
 const btnAdd = form.querySelector('[aria-label="add"]');
 const feedback = document.querySelector('.feedback');
 
