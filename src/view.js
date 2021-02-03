@@ -4,11 +4,53 @@ const containerFeeds = document.querySelector('.feeds');
 const containerPosts = document.querySelector('.posts');
 const form = document.querySelector('form');
 const input = form.querySelector('input');
+const btnAdd = form.querySelector('[aria-label="add"]');
 const feedback = document.querySelector('.feedback');
+
+const { body } = document;
+const backdrop = document.createElement('div');
+const modal = document.getElementById('modal');
+const modalTitle = modal.querySelector('.modal-title');
+const modalBody = modal.querySelector('.modal-body');
+const fullArticle = modal.querySelector('.full-article');
+const closeBtn = modal.querySelectorAll('[data-dismiss="modal"');
+
+const uiState = {
+  posts: [],
+};
 
 const renderSuccessText = () => {
   feedback.classList.add('text-success');
   feedback.textContent = i18next.t('success');
+};
+
+const makeVisited = (postId) => {
+  const { posts } = uiState;
+  const link = document.querySelector(`[data-id="${postId}"]`);
+  link.classList.add('font-weight-normal');
+  link.classList.remove('font-weight-bold');
+  uiState.posts = [...posts, postId];
+};
+
+const openModal = (post, link) => (e) => {
+  body.append(backdrop);
+  if (e.target.dataset.id === link.dataset.id) {
+    makeVisited(post.id);
+    body.classList.toggle('modal-open');
+    modal.classList.toggle('show');
+    modal.style.display = 'block';
+    modalTitle.textContent = post.postTitle;
+    modalBody.textContent = post.postDescription;
+    fullArticle.href = post.postLink;
+    backdrop.classList.add('modal-backdrop', 'fade', 'show');
+  }
+};
+
+const closeModal = () => {
+  body.classList.toggle('modal-open');
+  modal.classList.toggle('show');
+  modal.style.display = 'none';
+  backdrop.remove();
 };
 
 const renderFeeds = (dataFeeds) => {
@@ -39,7 +81,6 @@ const renderFeeds = (dataFeeds) => {
 };
 
 const renderPosts = (dataPosts) => {
-  console.log(dataPosts);
   containerPosts.innerHTML = '';
   const h2 = document.createElement('h2');
   h2.textContent = i18next.t('posts');
@@ -48,7 +89,6 @@ const renderPosts = (dataPosts) => {
   ul.classList.add('list-group');
 
   dataPosts.forEach((post) => {
-    console.log(post);
     const li = document.createElement('li');
     li.classList.add('list-group-item', 'd-flex', 'justify-content-between', 'align-items-start');
 
@@ -66,15 +106,11 @@ const renderPosts = (dataPosts) => {
     btn.dataset.id = post.id;
     btn.dataset.toggle = 'modal';
     btn.dataset.target = '#modal';
-    btn.addEventListener('click', (e) => {
-      const { body } = document;
-      console.log(body);
-      const modal = document.getElementById('modal');
-      if (e.target.dataset.id === link.dataset.id) {
-        body.classList.toggle('modal-open');
-        modal.classList.toggle('show');
-        modal.style.display = 'block';
-      }
+
+    btn.addEventListener('click', openModal(post, link));
+
+    closeBtn.forEach((element) => {
+      element.addEventListener('click', closeModal);
     });
 
     li.append(link);
@@ -84,10 +120,6 @@ const renderPosts = (dataPosts) => {
   containerPosts.append(h2);
   containerPosts.append(ul);
 };
-
-// const renderModal = (postId, element) => {
-//   // element.modalTitle = post.title;
-// };
 
 const renderErrors = (error) => {
   feedback.textContent = '';
@@ -111,16 +143,18 @@ const renderValid = (valid) => {
 const processStateHandle = (processState) => {
   switch (processState) {
     case 'failed':
-      console.log(processState);
+      btnAdd.disabled = false;
       break;
     case 'filling':
-      console.log(processState);
+      btnAdd.disabled = false;
       break;
     case 'sending':
+      btnAdd.disabled = true;
       form.reset();
       break;
     case 'finished':
       renderSuccessText();
+      btnAdd.disabled = false;
       break;
     default:
       break;

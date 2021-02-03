@@ -59,7 +59,6 @@ const updateFeeds = (state) => {
         const { feedId } = feed;
         const feedData = parser(response.data.contents);
         const resultFilter = feedData.posts.filter((post) => {
-          console.log(post.postDate, state.date);
           const result = Date.parse(post.postDate) > state.date;
           return result;
         });
@@ -120,17 +119,19 @@ export default () => {
     watchedState.form.valid = _.isEqual(errors, {});
     watchedState.form.errors = errors;
 
+    if (errors) {
+      watchedState.form.processState = 'failed';
+    }
+
     if (Object.keys(errors).length === 0) {
       watchedState.form.valid = true;
       watchedState.form.processState = 'sending';
 
-      console.log(state);
       axios.get(getProxyUrl(link))
         .then((response) => {
           addFeed(watchedState, parser(response.data.contents));
           updateFeeds(watchedState);
           watchedState.form.processState = 'finished';
-          console.log(state);
         })
         .catch((error) => {
           watchedState.form.processError = errorMessages.network.error;
