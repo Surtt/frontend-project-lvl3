@@ -122,8 +122,6 @@ const renderPosts = (dataPosts) => {
 };
 
 const renderErrors = (error) => {
-  console.log(error);
-  console.log(feedback);
   feedback.textContent = '';
   if (!error) {
     return;
@@ -135,13 +133,14 @@ const renderErrors = (error) => {
 };
 
 const renderValid = (valid) => {
-  if (!valid) {
-    input.classList.add('is-invalid');
-    feedback.classList.add('text-danger');
-  } else {
-    input.classList.remove('is-invalid');
-    feedback.classList.remove('text-danger');
-  }
+  console.log(valid);
+  // if (!valid) {
+  //   input.classList.add('is-invalid');
+  //   feedback.classList.add('text-danger');
+  // } else {
+  input.classList.remove('is-invalid');
+  feedback.classList.remove('text-danger');
+  // }
 };
 
 const processStateHandle = (processState, error) => {
@@ -156,11 +155,13 @@ const processStateHandle = (processState, error) => {
       break;
     case 'sending':
       btnAdd.disabled = true;
+      input.setAttribute('readonly', 'readonly');
       form.reset();
       break;
     case 'finished':
       renderSuccessText();
       btnAdd.disabled = false;
+      input.removeAttribute('readonly');
       break;
     default:
       break;
