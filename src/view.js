@@ -22,6 +22,8 @@ const uiState = {
 const renderSuccessText = () => {
   feedback.classList.add('text-success');
   feedback.textContent = i18next.t('success');
+  input.classList.remove('is-invalid');
+  feedback.classList.remove('text-danger');
 };
 
 const makeVisited = (postId) => {
@@ -132,16 +134,18 @@ const renderErrors = (error) => {
   feedback.textContent = i18next.t(error);
 };
 
-const renderValid = (valid) => {
-  console.log(valid);
-  // if (!valid) {
-  //   input.classList.add('is-invalid');
-  //   feedback.classList.add('text-danger');
-  // } else {
-  input.classList.remove('is-invalid');
-  feedback.classList.remove('text-danger');
-  // }
-};
+// const renderValid = (valid) => {
+//   // console.log(valid);
+//   // if (!valid) {
+//   //   input.classList.add('is-invalid');
+//   //   feedback.classList.add('text-danger');
+//   // } else {
+//   // if (valid) {
+//   //   input.classList.remove('is-invalid');
+//   //   feedback.classList.remove('text-danger');
+//   // }
+//   // }
+// };
 
 const processStateHandle = (processState, error) => {
   switch (processState) {
@@ -159,7 +163,6 @@ const processStateHandle = (processState, error) => {
       form.reset();
       break;
     case 'finished':
-      renderSuccessText();
       btnAdd.disabled = false;
       input.removeAttribute('readonly');
       break;
@@ -175,7 +178,7 @@ export default (element) => (path, value) => {
       console.log(element);
       break;
     case 'form.valid':
-      renderValid(value);
+      renderSuccessText();
       break;
     case 'form.errors':
       renderErrors(value);
