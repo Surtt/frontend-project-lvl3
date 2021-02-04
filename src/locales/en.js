@@ -1,7 +1,7 @@
 export default {
   translation: {
     errors: {
-      url: 'Must be valid URL',
+      url: 'Must be valid url',
       notOneOf: 'Rss already exists',
     },
     success: 'Rss has been loaded',

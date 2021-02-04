@@ -122,7 +122,7 @@ const renderPosts = (dataPosts) => {
 };
 
 const renderErrors = (error) => {
-  feedback.textContent = '';
+  // feedback.textContent = '';
   if (Object.keys(error).length === 0) {
     return;
   }
