@@ -124,7 +124,7 @@ const renderPosts = (dataPosts) => {
 };
 
 const renderErrors = (error) => {
-  // console.log(feedback);
+  console.log(feedback);
   feedback.textContent = '';
   if (!error) {
     return;
@@ -160,8 +160,10 @@ const processStateHandle = (processState) => {
       break;
     case 'sending':
       // btnAdd.disabled = true;
+      feedback.classList.remove('text-success', 'text-danger');
       btnAdd.setAttribute('disabled', true);
       input.setAttribute('readonly', 'readonly');
+      feedback.innerHTML = null;
       form.reset();
       break;
     case 'finished':

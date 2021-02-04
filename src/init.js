@@ -123,7 +123,8 @@ export default () => {
     const formData = new FormData(e.target);
     const link = formData.get('url');
     watchedState.form.fields.rssLink = link;
-    watchedState.form.processState = 'filling';
+    // watchedState.form.processState = 'filling';
+    watchedState.form.processState = 'sending';
 
     // const addedUrls = watchedState.rssFeeds.map(({ url }) => url);
     const errors = validate(link, watchedState.rssFeeds);
@@ -137,7 +138,7 @@ export default () => {
 
     if (!errors) {
       // watchedState.form.valid = true;
-      watchedState.form.processState = 'sending';
+
 
       axios.get(getProxyUrl(link))
         .then((response) => {
