@@ -122,7 +122,7 @@ const renderPosts = (dataPosts) => {
 };
 
 const renderErrors = (error) => {
-  feedback.innerHTML = '';
+  // feedback.textContent = '';
   if (Object.keys(error).length === 0) {
     return;
   }
@@ -132,6 +132,7 @@ const renderErrors = (error) => {
 
 const renderValid = (valid) => {
   if (!valid) {
+    console.log(input);
     input.classList.add('is-invalid');
     feedback.classList.add('text-danger');
   } else {
