@@ -122,7 +122,7 @@ const renderPosts = (dataPosts) => {
 };
 
 const renderErrors = (error) => {
-  // feedback.textContent = '';
+  feedback.innerHTML = '';
   if (Object.keys(error).length === 0) {
     return;
   }
@@ -143,8 +143,7 @@ const renderValid = (valid) => {
 const processStateHandle = (processState) => {
   switch (processState) {
     case 'failed':
-      btnAdd.setAttribute('disabled', false);
-      // btnAdd.disabled = false;
+      btnAdd.disabled = false;
       break;
     case 'filling':
       btnAdd.disabled = false;
