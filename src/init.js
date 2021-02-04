@@ -7,11 +7,11 @@ import en from './locales/en.js';
 import parser from './parser.js';
 import view from './view.js';
 
-const errorMessages = {
-  network: {
-    error: 'Network Problems. Try again.',
-  },
-};
+// const errorMessages = {
+//   network: {
+//     error: 'Network Problems. Try again.',
+//   },
+// };
 
 const validate = (url, fields) => {
   // let errors = {};
