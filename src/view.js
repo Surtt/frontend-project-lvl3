@@ -143,7 +143,8 @@ const renderValid = (valid) => {
 const processStateHandle = (processState) => {
   switch (processState) {
     case 'failed':
-      btnAdd.disabled = false;
+      btnAdd.setAttribute('disabled', false);
+      // btnAdd.disabled = false;
       break;
     case 'filling':
       btnAdd.disabled = false;
