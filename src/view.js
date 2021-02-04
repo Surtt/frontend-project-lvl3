@@ -122,17 +122,20 @@ const renderPosts = (dataPosts) => {
 };
 
 const renderErrors = (error) => {
-  // feedback.textContent = '';
-  if (Object.keys(error).length === 0) {
+  console.log(error);
+  console.log(feedback);
+  feedback.textContent = '';
+  if (!error) {
     return;
   }
-
-  feedback.textContent = i18next.t(`errors.${error.e.type}`);
+  input.removeAttribute('readonly');
+  input.classList.add('is-invalid');
+  feedback.classList.add('text-danger');
+  feedback.textContent = i18next.t(error);
 };
 
 const renderValid = (valid) => {
   if (!valid) {
-    console.log(input);
     input.classList.add('is-invalid');
     feedback.classList.add('text-danger');
   } else {
@@ -141,9 +144,11 @@ const renderValid = (valid) => {
   }
 };
 
-const processStateHandle = (processState) => {
+const processStateHandle = (processState, error) => {
   switch (processState) {
     case 'failed':
+      console.log(error);
+      renderErrors(error);
       btnAdd.disabled = false;
       break;
     case 'filling':
@@ -162,10 +167,11 @@ const processStateHandle = (processState) => {
   }
 };
 
-export default (path, value) => {
+export default (element) => (path, value) => {
   switch (path) {
     case 'form.processState':
-      processStateHandle(value);
+      processStateHandle(value, element);
+      console.log(element);
       break;
     case 'form.valid':
       renderValid(value);

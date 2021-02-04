@@ -13,17 +13,19 @@ const errorMessages = {
   },
 };
 
-const validate = (urls, fields) => {
-  let errors = {};
-  const schema = yup.string().url().notOneOf(urls);
+const validate = (url, fields) => {
+  // let errors = {};
+  const links = fields.map((feed) => feed.url);
+  const schema = yup.string().url().notOneOf(links).required();
 
   try {
-    schema.validateSync(fields);
+    schema.validateSync(url);
+    return null;
   } catch (e) {
-    errors = { ...errors, e };
+    return e.message;
   }
 
-  return errors;
+  // return errors;
 };
 
 const addFeed = (state, feed) => {
@@ -102,7 +104,17 @@ export default () => {
     date: Date.now(),
   };
 
-  const watchedState = onChange(state, view);
+  yup.setLocale({
+    string: {
+      url: i18next.t('errors.url'),
+    },
+    mixed: {
+      notOneOf: i18next.t('errors.notOneOf'),
+      dataError: i18next.t('errors.dataError'),
+    },
+  });
+
+  const watchedState = onChange(state, view(state.form.fields.rssLink));
 
   const form = document.querySelector('form');
 
@@ -113,16 +125,17 @@ export default () => {
     watchedState.form.fields.rssLink = link;
     watchedState.form.processState = 'filling';
 
-    const addedUrls = watchedState.rssFeeds.map(({ url }) => url);
-    const errors = validate(addedUrls, watchedState.form.fields.rssLink);
+    // const addedUrls = watchedState.rssFeeds.map(({ url }) => url);
+    const errors = validate(link, watchedState.rssFeeds);
     watchedState.form.valid = _.isEqual(errors, {});
     watchedState.form.errors = errors;
+    console.log(errors);
+    // if (errors) {
+    //   watchedState.form.processState = 'failed';
+    //   console.log(state);
+    // }
 
-    if (errors) {
-      watchedState.form.processState = 'failed';
-    }
-
-    if (Object.keys(errors).length === 0) {
+    if (!errors) {
       watchedState.form.valid = true;
       watchedState.form.processState = 'sending';
 
@@ -131,12 +144,20 @@ export default () => {
           addFeed(watchedState, parser(response.data.contents));
           updateFeeds(watchedState);
           watchedState.form.processState = 'finished';
+          console.log(state);
         })
         .catch((error) => {
-          watchedState.form.processError = errorMessages.network.error;
+          watchedState.form.processError = errorMessages;
+          watchedState.form.processError = 'failed';
           watchedState.form.processState = 'failed';
+          watchedState.form.errors = i18next.t('errors.dataError');
+          // console.log(error.message);
+          console.log(state);
           return error;
         });
+    } else {
+      console.log(errors);
+      watchedState.form.errors = errors;
     }
   });
 };
