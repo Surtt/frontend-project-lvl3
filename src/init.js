@@ -97,7 +97,7 @@ export default () => {
         rssLink: '',
       },
       valid: true,
-      errors: {},
+      errors: null,
     },
     rssFeeds: [],
     posts: [],
@@ -114,7 +114,7 @@ export default () => {
     },
   });
 
-  const watchedState = onChange(state, view(state.form.fields.rssLink));
+  const watchedState = onChange(state, view);
 
   const form = document.querySelector('form');
 
@@ -127,7 +127,7 @@ export default () => {
 
     // const addedUrls = watchedState.rssFeeds.map(({ url }) => url);
     const errors = validate(link, watchedState.rssFeeds);
-    watchedState.form.valid = _.isEqual(errors, {});
+    // watchedState.form.valid = _.isEqual(errors, {});
     watchedState.form.errors = errors;
     console.log(errors);
     // if (errors) {
@@ -136,7 +136,7 @@ export default () => {
     // }
 
     if (!errors) {
-      watchedState.form.valid = true;
+      // watchedState.form.valid = true;
       watchedState.form.processState = 'sending';
 
       axios.get(getProxyUrl(link))

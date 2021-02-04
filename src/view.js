@@ -19,12 +19,12 @@ const uiState = {
   posts: [],
 };
 
-const renderSuccessText = () => {
-  feedback.classList.add('text-success');
-  feedback.textContent = i18next.t('success');
-  input.classList.remove('is-invalid');
-  feedback.classList.remove('text-danger');
-};
+// const renderSuccessText = () => {
+//   feedback.classList.add('text-success');
+//   feedback.textContent = i18next.t('success');
+//   input.classList.remove('is-invalid');
+//   feedback.classList.remove('text-danger');
+// };
 
 const makeVisited = (postId) => {
   const { posts } = uiState;
@@ -147,12 +147,11 @@ const renderErrors = (error) => {
 //   // }
 // };
 
-const processStateHandle = (processState, error) => {
+const processStateHandle = (processState) => {
   switch (processState) {
     case 'failed':
-      console.log(error);
-      renderErrors(error);
       btnAdd.disabled = false;
+      input.removeAttribute('readonly');
       break;
     case 'filling':
       btnAdd.disabled = false;
@@ -165,21 +164,25 @@ const processStateHandle = (processState, error) => {
     case 'finished':
       btnAdd.disabled = false;
       input.removeAttribute('readonly');
+      feedback.classList.add('text-success');
+      feedback.textContent = i18next.t('success');
+      input.classList.remove('is-invalid');
+      feedback.classList.remove('text-danger');
       break;
     default:
       break;
   }
 };
 
-export default (element) => (path, value) => {
+export default (path, value) => {
   switch (path) {
     case 'form.processState':
-      processStateHandle(value, element);
-      console.log(element);
+      processStateHandle(value);
       break;
-    case 'form.valid':
-      renderSuccessText();
-      break;
+    // case 'form.valid':
+    //   console.log(valid);
+    //   renderSuccessText();
+    //   break;
     case 'form.errors':
       renderErrors(value);
       break;
