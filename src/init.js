@@ -130,10 +130,10 @@ export default () => {
     // watchedState.form.valid = _.isEqual(errors, {});
     watchedState.form.errors = errors;
     console.log(errors);
-    // if (errors) {
-    //   watchedState.form.processState = 'failed';
-    //   console.log(state);
-    // }
+    if (errors) {
+      watchedState.form.processState = 'failed';
+      console.log(state);
+    }
 
     if (!errors) {
       // watchedState.form.valid = true;
@@ -147,7 +147,7 @@ export default () => {
           console.log(state);
         })
         .catch((error) => {
-          watchedState.form.processError = errorMessages;
+          // watchedState.form.processError = errorMessages;
           watchedState.form.processError = 'failed';
           watchedState.form.processState = 'failed';
           watchedState.form.errors = i18next.t('errors.dataError');

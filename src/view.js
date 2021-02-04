@@ -124,6 +124,7 @@ const renderPosts = (dataPosts) => {
 };
 
 const renderErrors = (error) => {
+  // console.log(feedback);
   feedback.textContent = '';
   if (!error) {
     return;
@@ -148,6 +149,7 @@ const renderErrors = (error) => {
 // };
 
 const processStateHandle = (processState) => {
+  console.log(processState);
   switch (processState) {
     case 'failed':
       btnAdd.disabled = false;
@@ -157,7 +159,8 @@ const processStateHandle = (processState) => {
       btnAdd.disabled = false;
       break;
     case 'sending':
-      btnAdd.disabled = true;
+      // btnAdd.disabled = true;
+      btnAdd.setAttribute('disabled', true);
       input.setAttribute('readonly', 'readonly');
       form.reset();
       break;
@@ -191,6 +194,10 @@ export default (path, value) => {
       break;
     case 'posts':
       renderPosts(value);
+      break;
+    case 'form.processError':
+      console.log(value);
+      input.setAttribute('readonly', 'readonly');
       break;
     default:
       break;
