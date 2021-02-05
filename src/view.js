@@ -163,7 +163,7 @@ const processStateHandle = (processState) => {
       break;
     case 'sending':
       // btnAdd.setAttribute('disable', 'true');
-      if (btnAdd.disabled === false) {
+      if (!btnAdd.disabled) {
         btnAdd.disabled = true;
         console.log(btnAdd.disabled);
       }
