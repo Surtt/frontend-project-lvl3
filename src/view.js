@@ -156,16 +156,13 @@ const processStateHandle = (processState) => {
       btnAdd.removeAttribute('disabled');
       // console.log(btnAdd.disabled);
       btnAdd.disabled = false;
-      console.log(input);
       // input.removeAttribute('readonly');
       break;
     case 'filling':
-      btnAdd.removeAttribute('disabled', false);
+      btnAdd.removeAttribute('disabled');
       // btnAdd.disabled = false;
       break;
     case 'sending':
-      console.log(input);
-      console.log(btnAdd.disabled);
       // btnAdd.disabled = true;
       btnAdd.setAttribute('disabled', true);
       input.setAttribute('readonly', 'readonly');
