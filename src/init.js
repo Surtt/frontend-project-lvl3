@@ -139,7 +139,6 @@ export default () => {
     if (!errors) {
       // watchedState.form.valid = true;
 
-
       axios.get(getProxyUrl(link))
         .then((response) => {
           addFeed(watchedState, parser(response.data.contents));

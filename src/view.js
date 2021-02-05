@@ -152,18 +152,24 @@ const processStateHandle = (processState) => {
   console.log(processState);
   switch (processState) {
     case 'failed':
+      btnAdd.setAttribute('disable', 'false');
+      console.log(btnAdd.disabled);
       btnAdd.disabled = false;
       input.removeAttribute('readonly');
       break;
     case 'filling':
+      btnAdd.setAttribute('disable', 'false');
       btnAdd.disabled = false;
       break;
     case 'sending':
-      btnAdd.disabled = true;
-      btnAdd.setAttribute('disabled', true);
-      input.setAttribute('readonly', 'readonly');
+      // btnAdd.setAttribute('disable', 'true');
+      if (btnAdd.disabled === false) {
+        btnAdd.disabled = true;
+        console.log(btnAdd.disabled);
+      }
+      // btnAdd.setAttribute('disabled', true);
+      // input.setAttribute('readonly', 'readonly');
       feedback.innerHTML = null;
-      form.reset();
       break;
     case 'finished':
       btnAdd.disabled = false;
@@ -172,6 +178,7 @@ const processStateHandle = (processState) => {
       feedback.textContent = i18next.t('success');
       input.classList.remove('is-invalid');
       feedback.classList.remove('text-danger');
+      form.reset();
       break;
     default:
       break;
