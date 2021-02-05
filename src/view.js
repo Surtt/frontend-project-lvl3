@@ -129,6 +129,7 @@ const renderErrors = (error) => {
   if (!error) {
     return;
   }
+  btnAdd.removeAttribute('disabled');
   input.removeAttribute('readonly');
   input.classList.add('is-invalid');
   feedback.classList.add('text-danger');
@@ -152,23 +153,22 @@ const processStateHandle = (processState) => {
   console.log(processState);
   switch (processState) {
     case 'failed':
-      btnAdd.setAttribute('disable', 'false');
-      console.log(btnAdd.disabled);
+      btnAdd.removeAttribute('disabled');
+      // console.log(btnAdd.disabled);
       btnAdd.disabled = false;
-      input.removeAttribute('readonly');
+      console.log(input);
+      // input.removeAttribute('readonly');
       break;
     case 'filling':
-      btnAdd.setAttribute('disable', 'false');
-      btnAdd.disabled = false;
+      btnAdd.removeAttribute('disabled', false);
+      // btnAdd.disabled = false;
       break;
     case 'sending':
-      // btnAdd.setAttribute('disable', 'true');
-      if (!btnAdd.disabled) {
-        btnAdd.disabled = true;
-        console.log(btnAdd.disabled);
-      }
-      // btnAdd.setAttribute('disabled', true);
-      // input.setAttribute('readonly', 'readonly');
+      console.log(input);
+      console.log(btnAdd.disabled);
+      // btnAdd.disabled = true;
+      btnAdd.setAttribute('disabled', true);
+      input.setAttribute('readonly', 'readonly');
       feedback.innerHTML = null;
       break;
     case 'finished':
