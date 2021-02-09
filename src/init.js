@@ -13,10 +13,8 @@ import view from './view.js';
 //   },
 // };
 
-const validate = (url, fields) => {
-  // let errors = {};
-  const links = fields.map((feed) => feed.url);
-  const schema = yup.string().url().notOneOf(links).required();
+const validate = (url, feeds) => {
+  const schema = yup.string().url().notOneOf(feeds).required();
 
   try {
     schema.validateSync(url);
@@ -24,8 +22,6 @@ const validate = (url, fields) => {
   } catch (e) {
     return e.message;
   }
-
-  // return errors;
 };
 
 const addFeed = (state, feed) => {
@@ -54,41 +50,32 @@ const addFeed = (state, feed) => {
 const getProxyUrl = (url) => `https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(url)}`;
 
 const updateFeeds = (state) => {
-  state.rssFeeds.forEach((feed) => {
+  const promises = state.rssFeeds.map((feed) => { // eslint-disable-line array-callback-return
     axios.get(getProxyUrl(feed.url))
       .then((response) => {
-        const { feedId } = feed;
-        const feedData = parser(response.data.contents);
-        const resultFilter = feedData.posts.filter((post) => {
-          const result = Date.parse(post.postDate) > state.date;
-          return result;
-        });
-        resultFilter.forEach((post) => {
-          const newPost = { ...post, feedId };
-          state.posts.unshift(newPost);
-          const updateState = state;
-          updateState.date = Date.now();
-        });
+        // const { feedId } = feed;
+        const newPosts = parser(response.data.contents).posts;
+        const oldPosts = state.posts;
+        const diffPosts = _.differenceWith(
+          newPosts, oldPosts, (a, b) => a.postTitle === b.postTitle,
+        );
+        console.log(newPosts);
+        console.log(oldPosts);
+        console.log(diffPosts);
 
-        setTimeout(() => updateFeeds(state), 5000);
+        if (diffPosts.length > 0) {
+          state.posts = [...diffPosts, ...state.posts]; // eslint-disable-line no-param-reassign
+        }
       })
       .catch((error) => {
-        const updateState = state;
-        updateState.form.processError = error.response.status;
-        setTimeout(() => updateFeeds(state), 5000);
+        console.log(error);
       });
   });
+  console.log(promises);
+  Promise.all(promises).finally(() => setTimeout(() => updateFeeds(state), 5000));
 };
 
 export default () => {
-  i18next.init({
-    lng: 'en',
-    debug: true,
-    resources: {
-      en,
-    },
-  });
-
   const state = {
     form: {
       processState: 'filling',
@@ -99,6 +86,10 @@ export default () => {
       valid: true,
       errors: null,
     },
+    loading: {
+      loadingState: null,
+      error: null,
+    },
     rssFeeds: [],
     posts: [],
     date: Date.now(),
@@ -106,11 +97,11 @@ export default () => {
 
   yup.setLocale({
     string: {
-      url: i18next.t('errors.url'),
+      url: 'errors.url',
     },
     mixed: {
-      notOneOf: i18next.t('errors.notOneOf'),
-      dataError: i18next.t('errors.dataError'),
+      notOneOf: 'errors.notOneOf',
+      required: 'errors.required',
     },
   });
 
@@ -118,46 +109,56 @@ export default () => {
 
   const form = document.querySelector('form');
 
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const formData = new FormData(e.target);
-    const link = formData.get('url');
-    watchedState.form.fields.rssLink = link;
-    // watchedState.form.processState = 'filling';
-    watchedState.form.processState = 'sending';
+  i18next.init({
+    lng: 'en',
+    debug: true,
+    resources: {
+      en,
+    },
+  })
+    .then(() => {
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        const link = formData.get('url');
+        watchedState.form.fields.rssLink = link;
+        // watchedState.form.processState = 'filling';
+        watchedState.form.processState = 'sending';
 
-    // const addedUrls = watchedState.rssFeeds.map(({ url }) => url);
-    const errors = validate(link, watchedState.rssFeeds);
-    // watchedState.form.valid = _.isEqual(errors, {});
-    watchedState.form.errors = errors;
-    console.log(errors);
-    if (errors) {
-      watchedState.form.processState = 'failed';
-      console.log(state);
-    }
+        const feeds = watchedState.rssFeeds.map(({ url }) => url);
+        const errors = validate(link, feeds);
 
-    if (!errors) {
-      // watchedState.form.valid = true;
+        console.log(errors);
+        // if (errors) {
+        //   watchedState.form.processState = 'failed';
+        //   console.log(state);
+        // }
 
-      axios.get(getProxyUrl(link))
-        .then((response) => {
-          addFeed(watchedState, parser(response.data.contents));
-          updateFeeds(watchedState);
-          watchedState.form.processState = 'finished';
+        if (!errors) {
+          // watchedState.form.valid = true;
+
+          axios.get(getProxyUrl(link))
+            .then((response) => {
+              addFeed(watchedState, parser(response.data.contents));
+              updateFeeds(watchedState);
+              watchedState.form.processState = 'finished';
+              console.log(state);
+            })
+            .catch((error) => {
+              // watchedState.form.processError = errorMessages;
+              watchedState.form.processError = 'failed';
+              watchedState.form.processState = 'failed';
+              watchedState.form.errors = i18next.t('errors.dataError');
+              // console.log(error.message);
+              console.log(state);
+              return error;
+            });
+        } else {
+          console.log(errors);
           console.log(state);
-        })
-        .catch((error) => {
-          // watchedState.form.processError = errorMessages;
-          watchedState.form.processError = 'failed';
           watchedState.form.processState = 'failed';
-          watchedState.form.errors = i18next.t('errors.dataError');
-          // console.log(error.message);
-          console.log(state);
-          return error;
-        });
-    } else {
-      console.log(errors);
-      watchedState.form.errors = errors;
-    }
-  });
+          watchedState.form.errors = errors;
+        }
+      });
+    });
 };

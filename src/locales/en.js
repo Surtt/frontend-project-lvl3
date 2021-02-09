@@ -2,6 +2,7 @@ export default {
   translation: {
     errors: {
       url: 'Must be valid URL',
+      required: 'URL is required',
       notOneOf: 'Rss already exists',
       dataError: 'This source doesn\'t contain valid rss',
     },

@@ -164,6 +164,7 @@ const processStateHandle = (processState) => {
       break;
     case 'sending':
       // btnAdd.disabled = true;
+      console.log(btnAdd);
       btnAdd.setAttribute('disabled', true);
       input.setAttribute('readonly', 'readonly');
       feedback.innerHTML = null;
