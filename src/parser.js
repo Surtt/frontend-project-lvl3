@@ -1,22 +1,22 @@
-export default (response) => {
+export default (rssContent) => {
   const parser = new DOMParser();
-  const doc = parser.parseFromString(response, 'application/xml');
+  const doc = parser.parseFromString(rssContent, 'application/xml');
 
   const error = doc.querySelector('parsererror');
   if (error) {
-    throw new Error('dataError');
+    throw new Error(error.textContent);
   }
 
   const feedTitle = doc.querySelector('title').textContent;
   const feedDescription = doc.querySelector('description').textContent;
 
-  const posts = Array.from(doc.querySelectorAll('item')).map((item) => {
-    const postTitle = item.querySelector('title').textContent;
-    const postDescription = item.querySelector('description').textContent;
-    const postLink = item.querySelector('link').textContent;
-    const postDate = item.querySelector('pubDate').textContent;
+  const postElements = Array.from(doc.querySelectorAll('item'));
+  const posts = postElements.map((item) => {
+    const title = item.querySelector('title').textContent;
+    const description = item.querySelector('description').textContent;
+    const link = item.querySelector('link').textContent;
     return {
-      postTitle, postDescription, postLink, postDate,
+      title, description, link,
     };
   });
 
