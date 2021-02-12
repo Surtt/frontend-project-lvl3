@@ -12,25 +12,13 @@ export default (elements) => (path, value) => {
     link.classList.remove('font-weight-bold');
   };
 
-  const openModal = (post, link) => (e) => {
-    body.append(backdrop);
-    if (e.target.dataset.id === link.dataset.id) {
-      // makeVisited(post.id);
-      body.classList.add('modal-open');
-      modal.classList.add('show');
-      modal.style.display = 'block';
-      modalTitle.textContent = post.title;
-      modalBody.textContent = post.description;
-      fullArticle.href = post.link;
-      backdrop.classList.add('modal-backdrop', 'fade', 'show');
-    }
-  };
-
-  const closeModal = () => {
-    body.classList.remove('modal-open');
-    modal.classList.remove('show');
-    modal.style.display = 'none';
-    backdrop.remove();
+  const openModal = ({
+    description, title, link, id,
+  } = {}) => {
+    makeVisited(id);
+    modalTitle.textContent = title;
+    modalBody.textContent = description;
+    fullArticle.href = link;
   };
 
   const renderFeeds = (dataFeeds) => {
@@ -87,8 +75,6 @@ export default (elements) => (path, value) => {
       btn.dataset.toggle = 'modal';
       btn.dataset.target = '#modal';
 
-      btn.addEventListener('click', openModal(post, link));
-
       li.append(link);
       li.append(btn);
       ul.append(li);
@@ -96,10 +82,6 @@ export default (elements) => (path, value) => {
     containerPosts.append(h2);
     containerPosts.append(ul);
   };
-
-  closeBtn.forEach((element) => {
-    element.addEventListener('click', closeModal);
-  });
 
   // const renderSuccessText = () => {
   //   feedback.classList.add('text-success');
@@ -136,8 +118,10 @@ export default (elements) => (path, value) => {
         console.log(processState);
         renderErrors(i18next.t('errors.dataError'));
         btnAdd.removeAttribute('disabled');
-        btnAdd.disabled = false;
+        // btnAdd.disabled = false;
         input.removeAttribute('readonly');
+        input.classList.add('is-invalid');
+        feedback.classList.add('text-danger');
         break;
       case 'sending':
         console.log(processState);
@@ -179,7 +163,8 @@ export default (elements) => (path, value) => {
       renderPosts(value);
       break;
     case 'modalItem':
-      makeVisited(value);
+      console.log(value);
+      openModal(value);
       break;
     default:
       break;
