@@ -2,8 +2,7 @@ import i18next from 'i18next';
 
 export default (elements) => (path, value) => {
   const {
-    containerFeeds, containerPosts, input, btnAdd, feedback,
-    body, backdrop, modal, modalTitle, modalBody, fullArticle, closeBtn,
+    containerFeeds, containerPosts, input, btnAdd, feedback, modalTitle, modalBody, fullArticle,
   } = elements;
 
   const makeVisited = (postId) => {

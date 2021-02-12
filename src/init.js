@@ -100,6 +100,7 @@ export default () => i18next.init({
       mixed: {
         notOneOf: 'errors.notOneOf',
         required: 'errors.required',
+        // dataError: 'errors.dataError',
       },
     });
 
@@ -110,13 +111,9 @@ export default () => i18next.init({
       input: document.querySelector('[aria-label="url"]'),
       btnAdd: document.querySelector('[aria-label="add"]'),
       feedback: document.querySelector('.feedback'),
-      body: document.body,
-      backdrop: document.createElement('div'),
-      modal: document.getElementById('modal'),
       modalTitle: document.querySelector('.modal-title'),
       modalBody: document.querySelector('.modal-body'),
       fullArticle: document.querySelector('.full-article'),
-      closeBtn: document.querySelectorAll('[data-dismiss="modal"'),
     };
 
     const schema = yup.string().url();
@@ -145,7 +142,8 @@ export default () => i18next.init({
           })
           .catch((error) => {
             watchedState.process.processState = 'failed';
-            watchedState.process.error = error.message;
+            console.log(error.message);
+            watchedState.process.error = error.message === 'dataError' ? 'dataError' : 'networkError';
             watchedState.form.errors = null;
             console.log(state);
           });

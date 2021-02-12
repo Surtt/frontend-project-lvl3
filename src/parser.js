@@ -4,7 +4,7 @@ export default (rssContent) => {
 
   const error = doc.querySelector('parsererror');
   if (error) {
-    throw new Error(error.textContent);
+    throw new Error(error.textContent = 'dataError');
   }
 
   const feedTitle = doc.querySelector('title').textContent;
