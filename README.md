@@ -5,6 +5,9 @@
 
 
 # RSS Reader
+
+RSS Reader is an aplication for aggregating RSS feeds that allows you to add feeds, view previews and open links. The feeds utomatically updated every five seconds.
+
 Project URL: [RSS Reader](https://frontend-project-lvl3-five-sable.vercel.app/)
 
 ## Setup
@@ -16,3 +19,9 @@ make install
 ```
 make develop
 ```
+
+## Production mode
+```
+make build
+```
+

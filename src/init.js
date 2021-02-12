@@ -8,24 +8,20 @@ import parser from './parser.js';
 import view from './view.js';
 import 'bootstrap';
 
-const validate = (url, schema) => {
+const mainValidation = (link, feeds) => {
+  const schema = yup.string().url().required();
+  const urlSchema = schema.notOneOf(feeds);
   try {
-    schema.validateSync(url);
+    urlSchema.validateSync(link);
     return null;
   } catch (e) {
     return e.message;
   }
 };
 
-const mainValidation = (link, feeds, schema) => {
-  const urlSchema = schema.notOneOf(feeds);
-  const errors = validate(link, urlSchema);
-  return errors;
-};
-
 const addFeed = (state, feed) => {
   const {
-    feedTitle, feedDescription, posts,
+    title, description, posts,
   } = feed;
   const url = state.form.fields.rssLink;
 
@@ -33,8 +29,8 @@ const addFeed = (state, feed) => {
 
   const newFeed = {
     feedId,
-    feedTitle,
-    feedDescription,
+    title,
+    description,
     url,
   };
 
@@ -100,7 +96,6 @@ export default () => i18next.init({
       mixed: {
         notOneOf: 'errors.notOneOf',
         required: 'errors.required',
-        // dataError: 'errors.dataError',
       },
     });
 
@@ -116,7 +111,6 @@ export default () => i18next.init({
       fullArticle: document.querySelector('.full-article'),
     };
 
-    const schema = yup.string().url();
     const watchedState = onChange(state, view(elements));
 
     elements.form.addEventListener('submit', (e) => {
@@ -126,7 +120,7 @@ export default () => i18next.init({
       watchedState.form.fields.rssLink = link;
 
       const feeds = watchedState.rssFeeds.map(({ url }) => url);
-      const errors = mainValidation(link, feeds, schema);
+      const errors = mainValidation(link, feeds);
 
       if (!errors) {
         watchedState.process.processState = 'sending';
@@ -138,14 +132,15 @@ export default () => i18next.init({
             watchedState.process.error = null;
             watchedState.form.valid = true;
             watchedState.form.errors = null;
-            console.log(state);
           })
           .catch((error) => {
-            watchedState.process.processState = 'failed';
-            console.log(error.message);
+            if (error.message === 'dataError') {
+              watchedState.process.processState = 'failed';
+            } else {
+              watchedState.process.processState = 'networkFailed';
+            }
             watchedState.process.error = error.message === 'dataError' ? 'dataError' : 'networkError';
             watchedState.form.errors = null;
-            console.log(state);
           });
       } else {
         watchedState.form.errors = errors;
@@ -155,7 +150,7 @@ export default () => i18next.init({
 
     elements.containerPosts.addEventListener('click', (e) => {
       const { id } = e.target.dataset;
-      // console.log(e.target);
+
       if (!id) {
         return;
       }

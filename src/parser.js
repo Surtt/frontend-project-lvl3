@@ -20,5 +20,5 @@ export default (rssContent) => {
     };
   });
 
-  return { feedTitle, feedDescription, posts };
+  return { title: feedTitle, description: feedDescription, posts };
 };

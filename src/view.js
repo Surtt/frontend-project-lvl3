@@ -11,7 +11,7 @@ export default (elements) => (path, value) => {
     link.classList.remove('font-weight-bold');
   };
 
-  const openModal = ({
+  const fillingModal = ({
     description, title, link, id,
   } = {}) => {
     makeVisited(id);
@@ -33,10 +33,10 @@ export default (elements) => (path, value) => {
       li.classList.add('list-group-item');
 
       const h3 = document.createElement('h3');
-      h3.textContent = feed.feedTitle;
+      h3.textContent = feed.title;
 
       const p = document.createElement('p');
-      p.textContent = feed.feedDescription;
+      p.textContent = feed.description;
 
       li.append(h3);
       li.append(p);
@@ -82,24 +82,22 @@ export default (elements) => (path, value) => {
     containerPosts.append(ul);
   };
 
-  // const renderSuccessText = () => {
-  //   feedback.classList.add('text-success');
-  //   // input.classList.remove('is-invalid');
-  //   // feedback.classList.remove('text-danger');
-  //   feedback.textContent = i18next.t('success');
-  //   console.log(feedback);
-  // };
+  const renderSuccessText = () => {
+    feedback.classList.add('text-success');
+    feedback.textContent = i18next.t('success');
+  };
 
   const renderErrors = (error) => {
     feedback.textContent = '';
     if (!error) {
       return;
     }
+    input.classList.add('is-invalid');
+    feedback.classList.add('text-danger');
     feedback.textContent = i18next.t(error);
   };
 
   const renderValid = (valid) => {
-    console.log(valid);
     if (!valid) {
       input.classList.add('is-invalid');
       feedback.classList.add('text-danger');
@@ -114,28 +112,27 @@ export default (elements) => (path, value) => {
   const processStateHandle = (processState) => {
     switch (processState) {
       case 'failed':
-        console.log(processState);
         renderErrors(i18next.t('errors.dataError'));
         btnAdd.removeAttribute('disabled');
-        // btnAdd.disabled = false;
         input.removeAttribute('readonly');
-        input.classList.add('is-invalid');
-        feedback.classList.add('text-danger');
+
+        break;
+      case 'networkFailed':
+        renderErrors(i18next.t('errors.networkError'));
+        btnAdd.removeAttribute('disabled');
+        input.removeAttribute('readonly');
         break;
       case 'sending':
-        console.log(processState);
         feedback.classList.remove('text-success', 'text-danger');
         btnAdd.setAttribute('disabled', true);
         input.setAttribute('readonly', 'readonly');
         feedback.innerHTML = null;
         break;
       case 'finished':
-        console.log(processState);
+        renderSuccessText();
         btnAdd.removeAttribute('disabled');
         input.removeAttribute('readonly');
-        feedback.textContent = i18next.t('success');
         input.classList.remove('is-invalid');
-        feedback.classList.add('text-success');
         input.value = null;
         input.focus();
         break;
@@ -149,7 +146,6 @@ export default (elements) => (path, value) => {
       processStateHandle(value);
       break;
     case 'form.valid':
-      console.log(value);
       renderValid(value);
       break;
     case 'form.errors':
@@ -162,8 +158,7 @@ export default (elements) => (path, value) => {
       renderPosts(value);
       break;
     case 'modalItem':
-      console.log(value);
-      openModal(value);
+      fillingModal(value);
       break;
     default:
       break;
