@@ -88,7 +88,6 @@ export default (elements) => (path, value) => {
   };
 
   const renderErrors = (error) => {
-    feedback.textContent = '';
     if (!error) {
       return;
     }
