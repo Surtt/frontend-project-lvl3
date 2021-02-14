@@ -8,16 +8,9 @@ import parser from './parser.js';
 import view from './view.js';
 import 'bootstrap';
 
-const mainValidation = (link, feeds) => {
-  const schema = yup.string().url().required();
-  const urlSchema = schema.notOneOf(feeds);
-  try {
-    urlSchema.validateSync(link);
-    return null;
-  } catch (e) {
-    return e.message;
-  }
-};
+const mainValidation = (link, feeds) => yup
+  .string().url().required().notOneOf(feeds)
+  .validateSync(link);
 
 const addFeed = (state, feed) => {
   const {
@@ -120,9 +113,9 @@ export default () => i18next.init({
       watchedState.form.fields.rssLink = link;
 
       const feeds = watchedState.rssFeeds.map(({ url }) => url);
-      const errors = mainValidation(link, feeds);
 
-      if (!errors) {
+      try {
+        mainValidation(link, feeds);
         watchedState.process.processState = 'sending';
         watchedState.form.valid = true;
         axios.get(getProxyUrl(link))
@@ -132,19 +125,15 @@ export default () => i18next.init({
             watchedState.process.processState = 'finished';
             watchedState.process.error = null;
             watchedState.form.errors = null;
-            console.log(state);
           })
           .catch((error) => {
             watchedState.process.processState = 'failed';
             watchedState.process.error = error.message === 'dataError' ? 'dataError' : 'networkError';
             watchedState.form.errors = null;
-            console.log(error);
-            console.log(state);
           });
-      } else {
-        watchedState.form.errors = errors;
+      } catch (error) {
+        watchedState.form.errors = error.message;
         watchedState.form.valid = false;
-        console.log(state);
       }
     });
 
