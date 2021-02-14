@@ -88,13 +88,12 @@ export default (elements) => (path, value) => {
   };
 
   const renderErrors = (error) => {
-    feedback.textContent = '';
     if (!error) {
       return;
     }
     input.classList.add('is-invalid');
     feedback.classList.add('text-danger');
-    feedback.textContent = i18next.t(error);
+    feedback.textContent = i18next.t(`errors.${error}`);
   };
 
   const renderValid = (valid) => {
@@ -104,21 +103,12 @@ export default (elements) => (path, value) => {
     } else {
       input.classList.remove('is-invalid');
       feedback.classList.remove('text-danger');
-      feedback.classList.add('text-success');
-      feedback.textContent = i18next.t('success');
     }
   };
 
   const processStateHandle = (processState) => {
     switch (processState) {
       case 'failed':
-        renderErrors(i18next.t('errors.dataError'));
-        btnAdd.removeAttribute('disabled');
-        input.removeAttribute('readonly');
-
-        break;
-      case 'networkFailed':
-        renderErrors(i18next.t('errors.networkError'));
         btnAdd.removeAttribute('disabled');
         input.removeAttribute('readonly');
         break;
@@ -159,6 +149,9 @@ export default (elements) => (path, value) => {
       break;
     case 'modalItem':
       fillingModal(value);
+      break;
+    case 'process.error':
+      renderErrors(`errors.${value}`);
       break;
     default:
       break;
