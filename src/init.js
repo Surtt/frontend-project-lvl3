@@ -33,7 +33,7 @@ const addFeed = (state, feed) => {
   state.posts.unshift(...newPosts);
 };
 
-const getProxyUrl = (url) => `https://hexlet-alloriginss.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(url)}`;
+const getProxyUrl = (url) => `https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(url)}`;
 
 const updateFeeds = (state) => {
   const promises = state.rssFeeds.map((feed) => { // eslint-disable-line array-callback-return
