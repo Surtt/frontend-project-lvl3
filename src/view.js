@@ -89,6 +89,7 @@ export default (state, elements) => onChange(state, (path) => {
   };
 
   const renderErrors = (error) => {
+    feedback.textContent = '';
     input.classList.add('is-invalid');
     feedback.classList.add('text-danger');
     feedback.textContent = i18next.t(`errors.${error}`);
