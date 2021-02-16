@@ -114,14 +114,16 @@ export default () => i18next.init({
       const formData = new FormData(e.target);
       const link = formData.get('url');
       watchedState.form.fields.rssLink = link;
+      watchedState.form.valid = true;
+      watchedState.form.error = null;
+      watchedState.process.processState = null;
 
       const feeds = watchedState.rssFeeds.map(({ url }) => url);
 
       try {
         mainValidation(link, feeds);
         watchedState.process.processState = 'sending';
-        watchedState.form.valid = true;
-        watchedState.form.error = null;
+
         axios.get(getProxyUrl(link))
           .then((response) => {
             addFeed(watchedState, parser(response.data.contents));
