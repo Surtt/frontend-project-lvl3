@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import axios from 'axios';
-import onChange from 'on-change';
 import * as yup from 'yup';
 import i18next from 'i18next';
 import en from './locales/en.js';
@@ -8,13 +7,11 @@ import parser from './parser.js';
 import view from './view.js';
 import 'bootstrap';
 
-const mainValidation = (link, feeds) => yup
-  .string().url().required().notOneOf(feeds)
-  .validateSync(link);
+const getValidator = () => yup.string().url().required();
 
 const addFeed = (state, feed) => {
   const {
-    title, description, posts,
+    title, description, items,
   } = feed;
   const url = state.form.fields.rssLink;
 
@@ -29,30 +26,33 @@ const addFeed = (state, feed) => {
 
   state.rssFeeds.push(newFeed);
 
-  const newPosts = posts.map((post) => ({ ...post, feedId, id: Number(_.uniqueId()) }));
+  const newPosts = items.map((post) => ({ ...post, feedId, id: Number(_.uniqueId()) }));
   state.posts.unshift(...newPosts);
 };
 
-const getProxyUrl = (url) => `https://hexlet-allorigins.herokuapp.com/get?disableCache=true&url=${encodeURIComponent(url)}`;
+const getProxyUrl = (url) => {
+  const proxyUrl = new URL('/get', 'https://hexlet-allorigins.herokuapp.com');
+  proxyUrl.searchParams.set('disableCache', 'true');
+  proxyUrl.searchParams.set('url', url);
+  return proxyUrl.toString();
+};
 
 const updateFeeds = (state) => {
-  const promises = state.rssFeeds.map((feed) => { // eslint-disable-line array-callback-return
-    axios.get(getProxyUrl(feed.url))
-      .then((response) => {
-        const newPosts = parser(response.data.contents).posts;
-        const oldPosts = state.posts;
-        const diffPosts = _.differenceWith(
-          newPosts, oldPosts, (a, b) => a.title === b.title,
-        );
+  const promises = state.rssFeeds.map((feed) => axios.get(getProxyUrl(feed.url))
+    .then((response) => {
+      const newPosts = parser(response.data.contents).items;
+      const oldPosts = state.posts;
+      const diffPosts = _.differenceWith(
+        newPosts, oldPosts, (a, b) => a.title === b.title,
+      );
 
-        if (diffPosts.length > 0) {
-          state.posts = [...diffPosts, ...state.posts]; // eslint-disable-line no-param-reassign
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  });
+      if (diffPosts.length > 0) {
+        state.posts = [...diffPosts, ...state.posts]; // eslint-disable-line no-param-reassign
+      }
+    })
+    .catch((error) => {
+      console.log(error);
+    }));
   Promise.all(promises).finally(() => setTimeout(() => updateFeeds(state), 5000));
 };
 
@@ -70,7 +70,7 @@ export default () => i18next.init({
           rssLink: '',
         },
         valid: true,
-        errors: null,
+        error: null,
       },
       process: {
         processState: null,
@@ -104,7 +104,10 @@ export default () => i18next.init({
       fullArticle: document.querySelector('.full-article'),
     };
 
-    const watchedState = onChange(state, view(elements));
+    const watchedState = view(state, elements);
+    const validate = getValidator();
+
+    const mainValidation = (link, feeds) => validate.notOneOf(feeds).validateSync(link);
 
     elements.form.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -118,21 +121,24 @@ export default () => i18next.init({
         mainValidation(link, feeds);
         watchedState.process.processState = 'sending';
         watchedState.form.valid = true;
+        watchedState.form.error = null;
         axios.get(getProxyUrl(link))
           .then((response) => {
             addFeed(watchedState, parser(response.data.contents));
 
             watchedState.process.processState = 'finished';
             watchedState.process.error = null;
-            watchedState.form.errors = null;
           })
           .catch((error) => {
+            if (error.isAxiosError) {
+              watchedState.process.error = 'networkError';
+            } else {
+              watchedState.process.error = 'dataError';
+            }
             watchedState.process.processState = 'failed';
-            watchedState.process.error = error.message === 'dataError' ? 'dataError' : 'networkError';
-            watchedState.form.errors = null;
           });
       } catch (error) {
-        watchedState.form.errors = error.message;
+        watchedState.form.error = error.message;
         watchedState.form.valid = false;
       }
     });

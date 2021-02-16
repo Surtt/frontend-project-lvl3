@@ -4,14 +4,14 @@ export default (rssContent) => {
 
   const error = doc.querySelector('parsererror');
   if (error) {
-    throw new Error(error.textContent = 'dataError');
+    throw new Error(error.textContent);
   }
 
   const feedTitle = doc.querySelector('title').textContent;
   const feedDescription = doc.querySelector('description').textContent;
 
   const postElements = Array.from(doc.querySelectorAll('item'));
-  const posts = postElements.map((item) => {
+  const items = postElements.map((item) => {
     const title = item.querySelector('title').textContent;
     const description = item.querySelector('description').textContent;
     const link = item.querySelector('link').textContent;
@@ -20,5 +20,5 @@ export default (rssContent) => {
     };
   });
 
-  return { title: feedTitle, description: feedDescription, posts };
+  return { title: feedTitle, description: feedDescription, items };
 };

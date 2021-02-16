@@ -1,6 +1,7 @@
 import i18next from 'i18next';
+import onChange from 'on-change';
 
-export default (elements) => (path, value) => {
+export default (state, elements) => onChange(state, (path) => {
   const {
     containerFeeds, containerPosts, input, btnAdd, feedback, modalTitle, modalBody, fullArticle,
   } = elements;
@@ -88,16 +89,15 @@ export default (elements) => (path, value) => {
   };
 
   const renderErrors = (error) => {
-    if (!error) {
-      return;
-    }
     input.classList.add('is-invalid');
     feedback.classList.add('text-danger');
     feedback.textContent = i18next.t(`errors.${error}`);
   };
 
   const renderValid = (valid) => {
+    const { error } = state.form;
     if (!valid) {
+      renderErrors(error);
       input.classList.add('is-invalid');
       feedback.classList.add('text-danger');
     } else {
@@ -106,9 +106,11 @@ export default (elements) => (path, value) => {
     }
   };
 
-  const processStateHandle = (processState) => {
+  const processStateHandle = (mainState) => {
+    const { processState, error } = mainState.process;
     switch (processState) {
       case 'failed':
+        renderErrors(error);
         btnAdd.removeAttribute('disabled');
         input.removeAttribute('readonly');
         break;
@@ -133,27 +135,21 @@ export default (elements) => (path, value) => {
 
   switch (path) {
     case 'process.processState':
-      processStateHandle(value);
+      processStateHandle(state);
       break;
     case 'form.valid':
-      renderValid(value);
-      break;
-    case 'form.errors':
-      renderErrors(value);
+      renderValid(state.form.valid);
       break;
     case 'rssFeeds':
-      renderFeeds(value);
+      renderFeeds(state.rssFeeds);
       break;
     case 'posts':
-      renderPosts(value);
+      renderPosts(state.posts);
       break;
     case 'modalItem':
-      fillingModal(value);
-      break;
-    case 'process.error':
-      renderErrors(`errors.${value}`);
+      fillingModal(state.modalItem);
       break;
     default:
       break;
   }
-};
+});
