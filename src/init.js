@@ -7,7 +7,10 @@ import parser from './parser.js';
 import view from './view.js';
 import 'bootstrap';
 
-const getValidator = () => yup.string().url().required();
+const getValidator = () => {
+  const schema = yup.string().url().required();
+  return (link, feeds) => schema.notOneOf(feeds).validateSync(link);
+};
 
 const addFeed = (state, feed) => {
   const {
@@ -15,7 +18,7 @@ const addFeed = (state, feed) => {
   } = feed;
   const url = state.form.fields.rssLink;
 
-  const feedId = Number(_.uniqueId());
+  const feedId = _.uniqueId();
 
   const newFeed = {
     feedId,
@@ -26,7 +29,7 @@ const addFeed = (state, feed) => {
 
   state.rssFeeds.push(newFeed);
 
-  const newPosts = items.map((post) => ({ ...post, feedId, id: Number(_.uniqueId()) }));
+  const newPosts = items.map((post) => ({ ...post, feedId, id: _.uniqueId() }));
   state.posts.unshift(...newPosts);
 };
 
@@ -47,7 +50,7 @@ const updateFeeds = (state) => {
       );
 
       if (diffPosts.length > 0) {
-        state.posts = [...diffPosts, ...state.posts]; // eslint-disable-line no-param-reassign
+        state.posts.unshift(...diffPosts);
       }
     })
     .catch((error) => {
@@ -107,8 +110,6 @@ export default () => i18next.init({
     const watchedState = view(state, elements);
     const validate = getValidator();
 
-    const mainValidation = (link, feeds) => validate.notOneOf(feeds).validateSync(link);
-
     elements.form.addEventListener('submit', (e) => {
       e.preventDefault();
       const formData = new FormData(e.target);
@@ -121,7 +122,7 @@ export default () => i18next.init({
       const feeds = watchedState.rssFeeds.map(({ url }) => url);
 
       try {
-        mainValidation(link, feeds);
+        validate(link, feeds);
         watchedState.process.processState = 'sending';
 
         axios.get(getProxyUrl(link))
@@ -152,7 +153,7 @@ export default () => i18next.init({
         return;
       }
 
-      const currentPost = watchedState.posts.find(({ id: postId }) => postId === Number(id));
+      const currentPost = watchedState.posts.find(({ id: postId }) => postId === id);
 
       if (!currentPost) {
         return;
@@ -160,7 +161,7 @@ export default () => i18next.init({
 
       watchedState.modalItem = currentPost;
 
-      watchedState.readPosts.push(Number(id));
+      watchedState.readPosts.push(id);
     });
     setTimeout(() => updateFeeds(watchedState), 5000);
   });
