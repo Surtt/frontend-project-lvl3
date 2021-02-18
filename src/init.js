@@ -60,7 +60,7 @@ const updateFeeds = (state) => {
 };
 
 export default () => i18next.init({
-  lng: 'en',
+  lng: 'ru',
   debug: true,
   resources,
 })
@@ -106,6 +106,7 @@ export default () => i18next.init({
     };
 
     const watchedState = view(state, elements);
+    console.log(watchedState);
     const validate = getValidator();
 
     elements.form.addEventListener('submit', (e) => {

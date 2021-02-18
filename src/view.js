@@ -1,7 +1,7 @@
 import i18next from 'i18next';
 import onChange from 'on-change';
 
-export default (state, elements) => {
+export default (state, elements) => onChange(state, (path) => {
   const {
     containerFeeds, containerPosts, input, btnAdd, feedback, modalTitle, modalBody, fullArticle,
   } = elements;
@@ -134,25 +134,25 @@ export default (state, elements) => {
     }
   };
 
-  return onChange(state, (path) => {
-    switch (path) {
-      case 'process.processState':
-        processStateHandle(state);
-        break;
-      case 'form.valid':
-        renderValid(state.form.valid);
-        break;
-      case 'rssFeeds':
-        renderFeeds(state.rssFeeds);
-        break;
-      case 'posts':
-        renderPosts(state.posts);
-        break;
-      case 'modalItem':
-        fillingModal(state.modalItem);
-        break;
-      default:
-        break;
-    }
-  });
-};
+  // return onChange(state, (path) => {
+  switch (path) {
+    case 'process.processState':
+      processStateHandle(state);
+      break;
+    case 'form.valid':
+      renderValid(state.form.valid);
+      break;
+    case 'rssFeeds':
+      renderFeeds(state.rssFeeds);
+      break;
+    case 'posts':
+      renderPosts(state.posts);
+      break;
+    case 'modalItem':
+      fillingModal(state.modalItem);
+      break;
+    default:
+      break;
+  }
+  // };
+});
