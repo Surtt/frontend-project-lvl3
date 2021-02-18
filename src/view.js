@@ -1,7 +1,6 @@
 import i18next from 'i18next';
-import onChange from 'on-change';
 
-export default (state, elements) => onChange(state, (path) => {
+export default (state, path, elements) => {
   const {
     containerFeeds, containerPosts, input, btnAdd, feedback, modalTitle, modalBody, fullArticle,
   } = elements;
@@ -134,7 +133,6 @@ export default (state, elements) => onChange(state, (path) => {
     }
   };
 
-  // return onChange(state, (path) => {
   switch (path) {
     case 'process.processState':
       processStateHandle(state);
@@ -154,5 +152,4 @@ export default (state, elements) => onChange(state, (path) => {
     default:
       break;
   }
-  // };
-});
+};

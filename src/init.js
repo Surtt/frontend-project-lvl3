@@ -2,6 +2,7 @@ import _ from 'lodash';
 import axios from 'axios';
 import * as yup from 'yup';
 import i18next from 'i18next';
+import onChange from 'on-change';
 import resources from './locales/index.js';
 import parser from './parser.js';
 import view from './view.js';
@@ -105,7 +106,7 @@ export default () => i18next.init({
       fullArticle: document.querySelector('.full-article'),
     };
 
-    const watchedState = view(state, elements);
+    const watchedState = onChange(state, (path) => view(watchedState, path, elements));
     console.log(watchedState);
     const validate = getValidator();
 
