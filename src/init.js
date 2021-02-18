@@ -2,7 +2,7 @@ import _ from 'lodash';
 import axios from 'axios';
 import * as yup from 'yup';
 import i18next from 'i18next';
-import en from './locales/en.js';
+import resources from './locales/index.js';
 import parser from './parser.js';
 import view from './view.js';
 import 'bootstrap';
@@ -62,9 +62,7 @@ const updateFeeds = (state) => {
 export default () => i18next.init({
   lng: 'en',
   debug: true,
-  resources: {
-    en,
-  },
+  resources,
 })
   .then(() => {
     const state = {
