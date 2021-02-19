@@ -107,7 +107,6 @@ export default () => i18next.init({
     };
 
     const watchedState = onChange(state, (path) => view(watchedState, path, elements));
-    console.log(watchedState);
     const validate = getValidator();
 
     elements.form.addEventListener('submit', (e) => {

@@ -68,7 +68,7 @@ export default (state, path, elements) => {
 
       const btn = document.createElement('button');
       btn.classList.add('btn', 'btn-primary', 'btn-sm');
-      btn.textContent = i18next.t('button');
+      btn.textContent = i18next.t('previewButton');
       btn.setAttribute('type', 'button');
       btn.dataset.id = post.id;
       btn.dataset.toggle = 'modal';
