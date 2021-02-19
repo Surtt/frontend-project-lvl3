@@ -61,7 +61,7 @@ const updateFeeds = (state) => {
 };
 
 export default () => i18next.init({
-  lng: 'ru',
+  fallbackLng: 'ru',
   debug: true,
   resources,
 })
